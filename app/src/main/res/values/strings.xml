@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">My Physio Doc</string>
+    <string name="title_activity_main">Menu</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_statistics">Statistics</string>
+    <string name="title_activity_videos">Videos</string>
+    <string name="title_activity_exercise">Exercise</string>
+    <string name="title_activity_solutions">Solutions</string>
+
+    <!--REST API Related-->
+    <string name="rest_client_uri">http://192.168.250.15:8080</string>
+    <!--<string name="rest_client_uri">http://myphysiodocapi-amaronline.rhcloud.com</string>-->
+    <string name="rest_client_uri_patient">/webapi/patient</string>
+    <string name="rest_client_uri_physiotherapist">/webapi/physiotherapist</string>
+    <string name="rest_client_uri_login">/webapi/authentication/login</string>
+    <string name="rest_client_uri_logout">/webapi/authentication/logout</string>
+    <string name="rest_api_key">3b91cab8-926f-49b6-ba00-920bcf934c2a</string>
+
+</resources>

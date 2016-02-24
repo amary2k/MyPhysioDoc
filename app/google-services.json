@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "physiotherapyapp-c2bb9",
+    "project_number": "94158461774",
+    "name": "PhysiotherapyApp"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94158461774:android:454c59c66265de85",
+        "client_id": "android:com.example.PhysiotherapyApp",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.example.PhysiotherapyApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94158461774-of8gernijcd9fjjjdq3q5gisrechivj9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.PhysiotherapyApp",
+            "certificate_hash": "9842550348F6730D743272C64A3C7D16047263BA"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
