@@ -38,10 +38,11 @@
             android:label="@string/title_activity_solutions" />
         <activity
             android:name=".VideosActivity"
-            android:label="@string/title_activity_videos"/>
+            android:label="@string/title_activity_videos" />
         <activity
             android:name=".ExersiceActivity"
-            android:label="@string/title_activity_exercise"/>
+            android:label="@string/title_activity_exercise" />
+        <activity android:name=".ExerciseListActivity"></activity>
     </application>
 
 </manifest>

@@ -12,12 +12,18 @@ public class Schedule {
 
 	private Date exercise_date;
 
-	public Collection<Exercise> getPatients() {
+	public Collection<Exercise> getExercises() {
 		return exercises;
 	}
 
-	public void setPatients(Collection<Exercise> patients) {
-		this.exercises = patients;
+	public Schedule(Collection<Exercise> exercises, Date exercise_date) {
+		super();
+		this.exercises = exercises;
+		this.exercise_date = exercise_date;
+	}
+
+	public void setExercises(Collection<Exercise> exercises) {
+		this.exercises = exercises;
 	}
 
 	public Date getExercise_date() {
@@ -35,6 +41,7 @@ public class Schedule {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
-	
+
+
 }
+

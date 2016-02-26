@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.RestClient;
+import com.example.PhysiotherapistApp.Utility.Utility;
 
 import java.io.BufferedReader;
 import java.net.HttpURLConnection;
@@ -26,6 +27,7 @@ import java.util.HashMap;
  */
 public class MainFragment extends Fragment {
 
+    private View mProgressView;
     public MainFragment() {
     }
 
@@ -67,6 +69,8 @@ public class MainFragment extends Fragment {
                 mainMenuItems);
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        mProgressView = getActivity().findViewById(R.id.progressBar);
 
         ListView myListView = (ListView) rootView.findViewById(R.id.listView_menu);
         myListView.setAdapter(myArrayAdapter);
@@ -251,6 +255,7 @@ public class MainFragment extends Fragment {
 
 
         public void initClass(String strMethod, String strURL, HashMap<String,String> params, HashMap<String,String> headers, HashMap<String,String> bodyParams, View view, int intOptionNo) {
+            Utility.showProgress(mProgressView, getActivity().getBaseContext(), true);
             this.view = view;
             this.intOptionNo = intOptionNo;
             this.restClient = new RestClient(strMethod,strURL,params,headers, bodyParams, getContext());
@@ -259,6 +264,7 @@ public class MainFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             Intent i;
+            Utility.showProgress(mProgressView, getActivity().getBaseContext(), false);
             if(UserState.isPhysio()) {
                 switch (intOptionNo) {
                     case 0:
@@ -270,8 +276,7 @@ public class MainFragment extends Fragment {
                         break;
                     case 4:
                         i = new Intent(getContext().getApplicationContext(), LoginActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        i.putExtra("EXIT", true);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         break;
                 }
@@ -287,8 +292,7 @@ public class MainFragment extends Fragment {
                         break;
                     case 4:
                         i = new Intent(getContext().getApplicationContext(), LoginActivity.class);
-                        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        i.putExtra("EXIT", true);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                         break;
                 }

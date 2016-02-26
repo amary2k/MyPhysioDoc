@@ -228,6 +228,7 @@ public class AddPatientActivity extends ActionBarActivity {
         protected void onPostExecute(String s) {
             /*Toast successToast = Toast.makeText(view.getContext(), "Profile Saved Successfully!", LENGTH_SHORT);
             successToast.show();*/
+            Toast.makeText(getApplicationContext(), "Saved Succesfuly", Toast.LENGTH_SHORT).show();
             Utility.showProgress(mProgressView, mFormView, getBaseContext(), false);
             finish();
 

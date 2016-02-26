@@ -1,6 +1,8 @@
 package com.example.PhysiotherapistApp.Model;
 
-public class Exercise {
+import java.io.Serializable;
+
+public class Exercise implements Serializable {
 
 	private long id;
 

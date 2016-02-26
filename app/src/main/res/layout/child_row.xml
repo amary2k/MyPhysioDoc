@@ -5,7 +5,7 @@
     <TextView android:id="@+id/grp_child"
         android:paddingLeft="50px"
         android:focusable="false"
-        android:textSize="24px"
+        android:textSize="24dp"
         android:textStyle="normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
