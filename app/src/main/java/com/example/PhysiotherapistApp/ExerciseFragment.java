@@ -269,7 +269,7 @@ public class ExerciseFragment extends Fragment {
                     // Add Group
                     final HashMap<String, Object> group = new HashMap<String, Object>();
                     // TODO: Change to name with backend changes
-                    group.put(NAME, exercise.getDescription());
+                    group.put(NAME, exercise.getTitle());
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         group.put(IMAGE, getResources().getDrawable(getResources().getIdentifier(exercise.getImageName(), "drawable", getActivity().getPackageName()), null));
                     }

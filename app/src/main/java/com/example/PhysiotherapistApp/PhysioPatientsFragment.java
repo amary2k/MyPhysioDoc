@@ -82,13 +82,13 @@ public class PhysioPatientsFragment extends Fragment {
                     ArrayList secList = new ArrayList();
                     HashMap cm  = new HashMap();
                     cm.put("Child Item", "Exercise Routine");
-                    secList.add( cm );
+                    secList.add( cm );/*
                     cm = new HashMap();
                     cm.put("Child Item", "Rcommended Video");
                     secList.add( cm );
                     cm = new HashMap();
                     cm.put("Child Item", "Progress Summary");
-                    secList.add( cm );
+                    secList.add( cm );*/
                     listChildGroupData.add(secList);
                 }
                 if(jsonArray.length() > 0)

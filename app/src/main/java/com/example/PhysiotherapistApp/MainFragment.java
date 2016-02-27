@@ -53,7 +53,7 @@ public class MainFragment extends Fragment {
             // Patient Menu
             mainMenuItems = new String[]{
                 "Exercise Routine", //Done
-                    "My Profile",
+                    "My Profile",   //Done
                 "Messenger",
                 "Logout"            //Done
 

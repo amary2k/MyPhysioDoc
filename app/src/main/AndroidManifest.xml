@@ -31,18 +31,17 @@
             android:name=".AddPatientActivity"
             android:label="@string/title_activity_profile" />
         <activity
-            android:name=".StatisticsActivity"
-            android:label="@string/title_activity_statistics" />
-        <activity
             android:name=".PhysioPatientsActivity"
-            android:label="@string/title_activity_solutions" />
+            android:label="@string/title_activity_my_patients" />
         <activity
             android:name=".VideosActivity"
             android:label="@string/title_activity_videos" />
         <activity
             android:name=".ExersiceActivity"
             android:label="@string/title_activity_exercise" />
-        <activity android:name=".ExerciseListActivity"></activity>
+        <activity
+            android:name=".ExerciseListActivity"
+            android:label="@string/title_activity_exercise_list"/>
     </application>
 
 </manifest>
