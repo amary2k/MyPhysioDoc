@@ -42,6 +42,10 @@
         <activity
             android:name=".ExersiceActivity"
             android:label="@string/title_activity_exercise" />
+        <activity
+            android:name=".VideoPlayerActivity" />
+
+
         <activity android:name=".ExerciseListActivity"></activity>
     </application>
 

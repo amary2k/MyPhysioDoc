@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,20 +23,33 @@ import com.google.zxing.integration.android.IntentIntegrator;
 
 
 public class MainActivity extends ActionBarActivity {
-
+    Button button;
     public static Profile profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //TODO: Remove later just for Toast Test
-        Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT).show();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new MainFragment())
                     .commit();
         }
+
+        button = (Button) findViewById(R.id.MyButton);
+
+        // Capture button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View arg0) {
+
+                // Start NewActivity.class
+                Intent myIntent = new Intent(MainActivity.this,
+                        VideoPlayerActivity.class);
+                startActivity(myIntent);
+            }
+        });
 
 
     }
