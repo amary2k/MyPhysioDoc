@@ -35,13 +35,15 @@ public class RestClient {
     public static final String DELETE = "DELETE";
     public static final String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String APPLICATION_JSON = "application/json";
-    String strMethod;
-    String strURL;
-    HashMap<String,String> params;
-    HashMap<String,String> headers;
-    HashMap<String,String> bodyParams;
-    String body;
-    String contentType;
+    private String strMethod;
+    private String strURL;
+    private HashMap<String,String> params;
+    private HashMap<String,String> headers;
+    private HashMap<String,String> bodyParams;
+    private String body;
+    private String contentType;
+
+    static public String response;
 
     // These two need to be declared outside the try/catch
 // so that they can be closed in the finally block.
@@ -68,7 +70,7 @@ public class RestClient {
         this.bodyParams = bodyParams;
         this.body =  body;
         this.contentType = contentType;
-
+        RestClient.response = null;
     }
 
 
@@ -161,12 +163,14 @@ public class RestClient {
            Log.v("LOG_TAG","API CALL RESULT:" + strResponse);
         } catch (IOException e) {
             if(intResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                Toast toast = Toast.makeText(context, "Unauthorized Access", Toast.LENGTH_LONG);
+                Log.v("RestClient", "HTTP_UNAUTHORIZED");
+                //Toast.makeText(context, "Unauthorized Access", Toast.LENGTH_LONG).show();
             }
             else if(intResponseCode == HttpURLConnection.HTTP_UNAVAILABLE) {
-                Toast toast = Toast.makeText(context, "Server or Internet is down", Toast.LENGTH_LONG);
+                Log.v("RestClient", "HTTP_UNAVAILABLE");
+               // Toast.makeText(context, "Server or Internet is down", Toast.LENGTH_LONG).show();
             }
-            Log.e("PlaceholderFragment", "Error Response Code:" + intResponseCode , e);
+            Log.e("RestClient", "Error Response Code:" + intResponseCode , e);
             strResponse = null;
         } finally {
             if (urlConnection != null) {
@@ -176,10 +180,11 @@ public class RestClient {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e("PlaceholderFragment", "Error closing stream", e);
+                    Log.e("RestClient", "Error closing stream", e);
                 }
             }
         }
+        response = strResponse;
         return strResponse;
         //return null;
     }

@@ -27,7 +27,9 @@ public abstract class DefaultRestClient extends AsyncTask<Void,Void,String> {
         initClass(strMethod, strURL, new HashMap<String,String>(), new HashMap<String,String>(), new HashMap<String,String>(), view, body, contentType, context);
     }
 
-
+    public DefaultRestClient(String strMethod, String strURL, HashMap<String,String> params, View view, String body, String contentType, Context context){
+        initClass(strMethod, strURL, params, new HashMap<String,String>(), new HashMap<String,String>(), view, body, contentType, context);
+    }
     public void initClass(String strMethod, String strURL, HashMap<String,String> params, HashMap<String,String> headers, HashMap<String,String> bodyParams, View view, String body, String contentType, Context context) {
         this.view = view;
         this.restClient = new RestClient(strMethod,strURL,params,headers, bodyParams, context, body, contentType);

@@ -14,6 +14,7 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 import com.example.PhysiotherapistApp.Model.UserState;
+import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
 
 import org.json.JSONArray;
@@ -46,7 +47,8 @@ public class PhysioPatientsFragment extends Fragment {
 
             expandbleLis = (ExpandableListView) rootView.findViewById(R.id.expandable_list_view);
 
-            response = getArguments().getString("response");
+            response = RestClient.response;
+            //response = getArguments().getString("response");
 
             expListAdapter =
                     new SimpleExpandableListAdapter(
@@ -92,21 +94,40 @@ public class PhysioPatientsFragment extends Fragment {
                 if(jsonArray.length() > 0)
                 {
                     expandbleLis.setAdapter(expListAdapter);
+                    /*expandbleLis.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                        @Override
+                        public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                            ExpandableListAdapter mAdapter = parent.getExpandableListAdapter();
+                            String groupName = (String) ((HashMap)mAdapter.getGroup(groupPosition)).get("Group Item");
+                            PatientRestClient patientRestClient = new PatientRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), v, groupName);
+                            patientRestClient.execute();
+                            return true;
+                        }
+                    });*/
                     expandbleLis.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
                         @Override
-                        public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                        public boolean onChildClick(ExpandableListView parent, final View v, int groupPosition, int childPosition, long id) {
 
       /* You must make use of the View v, find the view by id and extract the text as below*/
 
                             ExpandableListAdapter mAdapter = parent.getExpandableListAdapter();
-                            String groupName = (String) ((HashMap)mAdapter.getGroup(groupPosition)).get("Group Item");
+                            final String groupName = (String) ((HashMap)mAdapter.getGroup(groupPosition)).get("Group Item");
                             //TextView tv = (TextView) v.getParent();
                             //String data = tv.getText().toString();
                             //Log.i("My App", groupName);
                             if (childPosition == 0) {
-                                PatientRestClient patientRestClient = new PatientRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), v, groupName);
-                                patientRestClient.execute();
+                                DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), v, null, RestClient.APPLICATION_JSON, getContext()) {
+                                    @Override
+                                    protected void onPostExecute(String s) {
+                                        Intent i = new Intent(getContext(), ExersiceActivity.class);
+                                        Bundle b = new Bundle();
+                                        b.putString("patientName", groupName);
+                                        i.putExtras(b);
+                                        startActivity(i);
+                                    }
+                                };
+                                defaultRestClient.execute();
                             }
                             return true;  // i missed this
                         }
@@ -122,7 +143,7 @@ public class PhysioPatientsFragment extends Fragment {
             return rootView;
         }
 
-    public class PatientRestClient extends AsyncTask<Void,Void,String> {
+   /* public class PatientRestClient extends AsyncTask<Void,Void,String> {
         RestClient restClient;
         View view;
         String strOption;
@@ -159,5 +180,5 @@ public class PhysioPatientsFragment extends Fragment {
         protected String doInBackground(Void... params) {
             return restClient.callRESTAPI();
         }
-    }
+    }*/
 }

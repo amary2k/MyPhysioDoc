@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
@@ -27,6 +28,7 @@ import com.example.PhysiotherapistApp.Model.Exercise;
 import com.example.PhysiotherapistApp.Model.Patient;
 import com.example.PhysiotherapistApp.Model.Physiotherapist;
 import com.example.PhysiotherapistApp.Model.Schedule;
+import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
@@ -79,32 +81,39 @@ public class ExerciseFragment extends Fragment {
 
             expandbleLis = (ExpandableListView) rootView.findViewById(R.id.exercise_expandableListView);
 
-            response = getArguments().getString("response");
-            String patientName = getArguments().getString("patientName");
+            response = RestClient.response;
+            //response = getArguments().getString("response");
+            if(UserState.isPhysio()) {
+                String patientName = getArguments().getString("patientName");
 
 
 
-                /*physio = new JSONObject(response);
-                JSONArray jsonArray = (JSONArray) physio.get("patients");
-                JSONObject patientJSON;
-                for (int i=0; i<jsonArray.length(); i++) {
-                    if(patientName.equals(((JSONObject) jsonArray.get(i)).getString("name")))
-                    {
-                        patientJSON = ((JSONObject) jsonArray.get(i));
-                    }
-                }*/
-            Gson gson = new Gson();
-            Physiotherapist physio = gson.fromJson(response, Physiotherapist.class);
-            patient = null;
-            //Iterator<Patient> i = physio.getPatients().iterator().;
-            for(Patient patientElement:physio.getPatients()){
-                if(patientElement.getName().equals(patientName)){
-                    patient = patientElement;
-                    break;
+                    /*physio = new JSONObject(response);
+                    JSONArray jsonArray = (JSONArray) physio.get("patients");
+                    JSONObject patientJSON;
+                    for (int i=0; i<jsonArray.length(); i++) {
+                        if(patientName.equals(((JSONObject) jsonArray.get(i)).getString("name")))
+                        {
+                            patientJSON = ((JSONObject) jsonArray.get(i));
+                        }
+                    }*/
+                Gson gson = new Gson();
+                Physiotherapist physio = gson.fromJson(response, Physiotherapist.class);
+                patient = null;
+                //Iterator<Patient> i = physio.getPatients().iterator().;
+                for (Patient patientElement : physio.getPatients()) {
+                    if (patientElement.getName().equals(patientName)) {
+                        patient = patientElement;
+                        break;
+                    } else {
+                    }// TODO: instead of return show message patitnt has no Exercises at all
                 }
-                else return rootView; // TODO: instead of return show message patitnt has no Exercises at all
             }
-
+            else
+            {
+                Gson gson = new Gson();
+                patient = gson.fromJson(response, Patient.class);
+            }
 
 
             calendarView = (CalendarView) rootView.findViewById(R.id.calendarView);
@@ -112,7 +121,7 @@ public class ExerciseFragment extends Fragment {
                 @Override
                 public void onSelectedDayChange(CalendarView view, int year, int month,
                                                 int dayOfMonth) {
-                    calDate = new GregorianCalendar( year, month, dayOfMonth );
+                    calDate = new GregorianCalendar(year, month, dayOfMonth);
                     calDayOfMonth = dayOfMonth;
                     calMonth = month;
                     calYear = year;
@@ -163,7 +172,7 @@ public class ExerciseFragment extends Fragment {
                         protected void onPostExecute(String s) {
                             // Hide Progress Bar
                             Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), false);
-                            if(s == null || s.length() < 1)
+                            if (s == null || s.length() < 1)
                                 Toast.makeText(getActivity().getApplicationContext(), "Failed to Save", Toast.LENGTH_SHORT).show();
                             else
                                 Toast.makeText(getActivity().getApplicationContext(), "Schedule Saved", Toast.LENGTH_SHORT).show();
@@ -173,9 +182,53 @@ public class ExerciseFragment extends Fragment {
                 }
             });
 
-            reloadExercises();
-            return rootView;
-        }
+
+            if(!UserState.isPhysio())
+                rootView.findViewById(R.id.exerciseButtonContainer).setVisibility(View.GONE);
+
+            expandbleLis.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                    final Collection<Schedule> schedules = patient.getSchedule();
+                    Iterator<Schedule> i = schedules.iterator();
+                    while (i.hasNext()) {
+                        Calendar cal = Calendar.getInstance();
+                        Schedule schedule = i.next();
+                        cal.setTime(schedule.getExercise_date());
+                        int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
+                        int exerciseMonth = cal.get(Calendar.MONTH);
+                        int exerciseYear = cal.get(Calendar.YEAR);
+
+                        if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
+                            int count = 0;
+                            for (Exercise exercise : schedule.getExercises()) {
+                                if (groupPosition == count) {
+                                    if(exercise.getVideoLink() == null || exercise.getVideoLink().length() == 0) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "No Videos for this Exercise", Toast.LENGTH_LONG).show();
+                                        return false;
+                                    }else {
+                                        String uri = getContext().getString(R.string.rest_client_uri) + getContext().getString(R.string.rest_client_uri_exercise_videos) + "/" + exercise.getVideoLink();
+                                        Intent newIntent = new Intent(getContext(), VideosActivity.class);
+                                        newIntent.putExtra("videoURI", uri);
+                                        startActivity(newIntent);
+                                        return true;
+                                    }
+
+                                } else
+                                    count++;
+                            }
+                        }
+                    }
+                    return false;
+
+                }
+
+            });
+
+        reloadExercises();
+        return rootView;
+    }
 
     private void reloadExercises(){
 
@@ -215,11 +268,10 @@ public class ExerciseFragment extends Fragment {
                 for(Exercise exercise:exerciseList) {
                     // Add Group
                     final HashMap<String, Object> group = new HashMap<String, Object>();
-                    byte[] b = exercise.getImage();
                     // TODO: Change to name with backend changes
                     group.put(NAME, exercise.getDescription());
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        group.put(IMAGE, new BitmapDrawable(BitmapFactory.decodeByteArray(b, 0, b.length)));
+                        group.put(IMAGE, getResources().getDrawable(getResources().getIdentifier(exercise.getImageName(), "drawable", getActivity().getPackageName()), null));
                     }
                     groupData.add(group);
 
@@ -244,12 +296,49 @@ public class ExerciseFragment extends Fragment {
                                                 new int[]{R.id.exerciseDescription} // the text field to populate with the child field data
                                         ) {
                                             @Override
-                                            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+                                            public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                                                 final View v = super.getGroupView(groupPosition, isExpanded, convertView, parent);
 
                                                 // Populate your custom view here
                                                 ((TextView) v.findViewById(R.id.exerciseRowName)).setText((String) ((Map<String, Object>) getGroup(groupPosition)).get(NAME));
                                                 ((ImageView) v.findViewById(R.id.exerciseIcon)).setImageDrawable((Drawable) ((Map<String, Object>) getGroup(groupPosition)).get(IMAGE));
+
+
+                                                ImageButton imageButton = (ImageButton) v.findViewById(R.id.exerciseDelButton);
+                                                if (UserState.isPhysio())
+                                                {
+                                                    imageButton.setOnClickListener(new ImageButton.OnClickListener() {
+
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            final Collection<Schedule> schedules = patient.getSchedule();
+                                                            //Toast.makeText(getApplicationContext(), "" + calDayOfMonth, 0).show();// TODO Auto-generated method stub
+                                                            Iterator<Schedule> i = schedules.iterator();
+                                                            while (i.hasNext()) {
+                                                                Calendar cal = Calendar.getInstance();
+                                                                Schedule schedule = i.next();
+                                                                cal.setTime(schedule.getExercise_date());
+                                                                int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
+                                                                int exerciseMonth = cal.get(Calendar.MONTH);
+                                                                int exerciseYear = cal.get(Calendar.YEAR);
+
+                                                                if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
+                                                                    int count = 0;
+                                                                    for (Exercise exercise : schedule.getExercises()) {
+                                                                        if (groupPosition == count) {
+                                                                            schedule.getExercises().remove(exercise);
+                                                                            break;
+                                                                        } else
+                                                                            count++;
+                                                                    }
+                                                                    reloadExercises();
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                else
+                                                    imageButton.setVisibility(View.GONE);
 
                                                 return v;
                                             }
@@ -290,6 +379,14 @@ public class ExerciseFragment extends Fragment {
                 {
                     if(calDate.getTime().getTime() == schedule.getExercise_date().getTime())
                     {
+                        for(Exercise existingExercise : schedule.getExercises()){
+                            // TODO: in future need to have a check for proper id
+                            if(existingExercise.getDescription().equals(exercise.getDescription())) {
+                                Toast.makeText(getActivity().getApplicationContext(), "Exercise already exists!", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+
                         schedule.getExercises().add(exercise);
                         reloadExercises();
                         return;

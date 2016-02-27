@@ -37,9 +37,9 @@ public class PhysioPatientsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         PhysioPatientsFragment physioPatientsFragment = new PhysioPatientsFragment();
-        Bundle b = getIntent().getExtras();
+        /*Bundle b = getIntent().getExtras();
         // Passing response from main menu to fragment
-        physioPatientsFragment.setArguments(b);
+        physioPatientsFragment.setArguments(b);*/
 
         setContentView(R.layout.activity_physio_patients);
         if (savedInstanceState == null) {

@@ -4,9 +4,9 @@
     android:layout_height="match_parent">
     <TextView android:id="@+id/row_name"
         android:paddingLeft="50px"
-        android:textSize="34dp"
-        android:textStyle="bold|normal|italic"
+        android:textSize="24dp"
+        android:textStyle="bold|normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_orange_light" />
+        android:textColor="@android:color/background_light" />
 </LinearLayout>

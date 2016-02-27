@@ -1,7 +1,10 @@
 package com.example.PhysiotherapistApp;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +21,7 @@ import com.example.PhysiotherapistApp.Utility.Utility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.List;
 public class ExerciseListActivity extends AppCompatActivity {
 
     List<Exercise> exerciseList;
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,13 +45,15 @@ public class ExerciseListActivity extends AppCompatActivity {
             //TODO: Set List View Empty
         }
         ListView listView = (ListView) findViewById(R.id.exerciseList);
-        List<byte[]> imageList = new ArrayList<>();
+        List<Drawable> imageList = new ArrayList<>();
         List<String> textItems = new ArrayList<>();
 
         Iterator<Exercise> listIterator = exerciseList.iterator();
         while(listIterator.hasNext()){
             Exercise exercise = listIterator.next();
-            imageList.add(exercise.getImage());
+
+            int resourceId = getResources().getIdentifier(exercise.getImageName(), "drawable", getPackageName());
+            imageList.add(getResources().getDrawable(resourceId, null ));
             textItems.add(exercise.getDescription());
         }
 
@@ -55,6 +62,7 @@ public class ExerciseListActivity extends AppCompatActivity {
         listView.setAdapter(imageTextAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent returnIntent = new Intent();

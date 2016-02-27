@@ -12,8 +12,10 @@
     <string name="title_activity_solutions">Solutions</string>
 
     <!--REST API Related-->
+    <!--<string name="rest_client_uri">http://10.100.58.118:8080</string>-->
     <string name="rest_client_uri">http://192.168.250.15:8080</string>
     <!--<string name="rest_client_uri">http://myphysiodocapi-amaronline.rhcloud.com</string>-->
+    <string name="rest_client_uri_exercise_videos">/videos</string>
     <string name="rest_client_uri_exercise">/webapi/exercise</string>
     <string name="rest_client_uri_patient">/webapi/patient</string>
     <string name="rest_client_uri_physiotherapist">/webapi/physiotherapist</string>

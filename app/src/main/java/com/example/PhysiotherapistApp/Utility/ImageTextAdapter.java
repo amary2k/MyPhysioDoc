@@ -24,9 +24,9 @@ public class ImageTextAdapter extends ArrayAdapter<String> {
     private final Activity context;
     List<String> itemname;
     //private final Integer[] imgid;
-    private final List<byte[]> images;
+    private final List<Drawable> images;
 
-    public ImageTextAdapter(Activity context, List<String> itemname, List<byte[]> images) {
+    public ImageTextAdapter(Activity context, List<String> itemname,List<Drawable> images) {
         super(context, R.layout.image_text_list, itemname);
 
         this.context=context;
@@ -41,8 +41,8 @@ public class ImageTextAdapter extends ArrayAdapter<String> {
         TextView txtTitle = (TextView) rowView.findViewById(R.id.itemName);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.itemIcon);
 
-        byte[] b = images.get(position);
-        Drawable image = new BitmapDrawable(BitmapFactory.decodeByteArray(b, 0, b.length));
+        //byte[] b = images.get(position);
+        Drawable image = images.get(position);
         txtTitle.setText(itemname.get(position));
         imageView.setImageDrawable(image);
         return rowView;

@@ -15,24 +15,15 @@ public class VideosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_videos);
 
-        MediaPlayer mp = new MediaPlayer();
-        try {
-            mp.setDataSource("http://www.cyberpt.com/cptqtws16HS.mov");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mp.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mp.start();
-        /*VideoView vidView = (VideoView)findViewById(R.id.videoView);
+        Bundle extras = getIntent().getExtras();
+        String vidAddress = extras.getString("videoURI");
 
-        String vidAddress = "http://nihseniorhealth.gov/nihsh/hipreplacement/faq/video/physicaltherapy_hi_8.flv";
+        VideoView vidView = (VideoView)findViewById(R.id.videoView);
+        //String vid = "http://nihseniorhealth.gov/hipreplacement/faq/video/physicaltherapy_hi_8.flv";
+        //String vidAddress = "http://10.100.58.118:5926/videos/physicaltherapy_hi_8.3gp";
         Uri vidUri = Uri.parse(vidAddress);
 
         vidView.setVideoURI(vidUri);
-        vidView.start();*/
+        vidView.start();
     }
 }
