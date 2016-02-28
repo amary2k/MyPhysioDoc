@@ -14,24 +14,37 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" android:weightSum="1">
 
-        <ListView
-            android:id="@+id/exerciseList"
-            android:layout_width="fill_parent"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/Cancel"
-            android:layout_weight=".90" />
+            android:layout_weight="0.10">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/exerciseListCancel"
-            android:layout_weight=".10" />
+            <ListView
+                android:id="@+id/exerciseList"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/Cancel"
+                android:layout_gravity="center_horizontal|top" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.90">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center_horizontal|bottom"
+                android:id="@+id/exerciseListCancel"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp" />
+        </FrameLayout>
     </LinearLayout>
 
 </RelativeLayout>

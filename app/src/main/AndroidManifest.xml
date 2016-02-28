@@ -29,19 +29,23 @@
             android:label="@string/title_activity_main" />
         <activity
             android:name=".AddPatientActivity"
-            android:label="@string/title_activity_profile" />
+            android:label="@string/title_activity_profile"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".PhysioPatientsActivity"
-            android:label="@string/title_activity_my_patients" />
+            android:label="@string/title_activity_my_patients"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".VideosActivity"
             android:label="@string/title_activity_videos" />
         <activity
             android:name=".ExersiceActivity"
-            android:label="@string/title_activity_exercise" />
+            android:label="@string/title_activity_exercise"
+            android:parentActivityName=".PhysioPatientsActivity"/>
         <activity
             android:name=".ExerciseListActivity"
-            android:label="@string/title_activity_exercise_list"/>
+            android:label="@string/title_activity_exercise_list"
+            android:parentActivityName=".ExersiceActivity"/>
     </application>
 
 </manifest>

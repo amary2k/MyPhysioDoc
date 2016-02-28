@@ -1,5 +1,6 @@
 package com.example.PhysiotherapistApp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
+import com.example.PhysiotherapistApp.Utility.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +33,7 @@ import java.util.HashMap;
  */
 public class PhysioPatientsFragment extends Fragment {
 
+        ProgressDialog pDialog;
         String response;
         ExpandableListView expandbleLis;
         SimpleExpandableListAdapter expListAdapter;
@@ -113,13 +116,12 @@ public class PhysioPatientsFragment extends Fragment {
 
                             ExpandableListAdapter mAdapter = parent.getExpandableListAdapter();
                             final String groupName = (String) ((HashMap)mAdapter.getGroup(groupPosition)).get("Group Item");
-                            //TextView tv = (TextView) v.getParent();
-                            //String data = tv.getText().toString();
-                            //Log.i("My App", groupName);
                             if (childPosition == 0) {
+                                pDialog = Utility.showTranslucentProgressDialog(getActivity());
                                 DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), v, null, RestClient.APPLICATION_JSON, getContext()) {
                                     @Override
                                     protected void onPostExecute(String s) {
+                                        pDialog.dismiss();
                                         Intent i = new Intent(getContext(), ExersiceActivity.class);
                                         Bundle b = new Bundle();
                                         b.putString("patientName", groupName);
@@ -142,43 +144,4 @@ public class PhysioPatientsFragment extends Fragment {
 
             return rootView;
         }
-
-   /* public class PatientRestClient extends AsyncTask<Void,Void,String> {
-        RestClient restClient;
-        View view;
-        String strOption;
-        // These two need to be declared outside the try/catch
-// so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-
-
-        public PatientRestClient(String strMethod, String strURL, View view, String strOption){
-            initClass(strMethod, strURL, new HashMap<String,String>(), new HashMap<String,String>(), new HashMap<String,String>(), view, strOption);
-        }
-
-
-        public void initClass(String strMethod, String strURL, HashMap<String,String> params, HashMap<String,String> headers, HashMap<String,String> bodyParams, View view, String strOption) {
-            this.view = view;
-            this.strOption = strOption;
-            this.restClient = new RestClient(strMethod,strURL,params,headers, bodyParams, getContext());
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-
-            Intent i = new Intent(view.getContext(), ExersiceActivity.class);
-            Bundle b = new Bundle();
-            b.putString("response", s); //Passing response to new acitivity
-            b.putString("patientName", strOption);
-            i.putExtras(b);
-            startActivity(i);
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            return restClient.callRESTAPI();
-        }
-    }*/
 }

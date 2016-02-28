@@ -1,14 +1,20 @@
 package com.example.PhysiotherapistApp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.VideoView;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.app.ProgressDialog;
 import android.util.Log;
 import android.widget.MediaController;
+
+import com.example.PhysiotherapistApp.Utility.Utility;
 
 public class VideosActivity extends AppCompatActivity {
 
@@ -21,22 +27,16 @@ public class VideosActivity extends AppCompatActivity {
         // Get the layout from video_main.xml
         setContentView(R.layout.activity_videos);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Bundle extras = getIntent().getExtras();
         String vidAddress = extras.getString("videoURI");
 
         videoview = (VideoView) findViewById(R.id.VideoView);
         // Execute StreamVideo AsyncTask
 
-        // Create a progressbar
-        pDialog = new ProgressDialog(VideosActivity.this);
-        // Set progressbar title
-        pDialog.setTitle("Streaming Exercise Video");
-        // Set progressbar message
-        pDialog.setMessage("Buffering...");
-        pDialog.setIndeterminate(false);
-        pDialog.setCancelable(true);
-        // Show progressbar
-        pDialog.show();
+        pDialog = Utility.showProgressDialog(VideosActivity.this,"Streaming Exercise Video","Buffering...");
+        //pDialog = Utility.showTranslucentProgressDialog(VideosActivity.this);
 
         try {
             // Start the MediaController
@@ -62,5 +62,17 @@ public class VideosActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                Intent returnIntent = new Intent();
+                setResult(Activity.RESULT_CANCELED, returnIntent);
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

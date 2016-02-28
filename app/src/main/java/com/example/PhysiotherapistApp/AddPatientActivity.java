@@ -1,9 +1,13 @@
 package com.example.PhysiotherapistApp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,19 +30,20 @@ import java.util.Date;
 import java.util.HashMap;
 
 
-public class AddPatientActivity extends ActionBarActivity {
+public class AddPatientActivity extends AppCompatActivity {
 
-    private View mProgressView;
-    private View mFormView;
+    private ProgressDialog pDialog;
+    //private View mProgressView;
+    //private View mFormView;
     private Gson gson = new Gson();
     private Patient existingPatient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_patient);
 
-        mFormView = findViewById(R.id.saveButton);
-        mProgressView = findViewById(R.id.progressBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final EditText editTextName;
         final EditText editTextCity;
@@ -89,8 +94,7 @@ public class AddPatientActivity extends ActionBarActivity {
                     existingPatient.setEmail(editTextEmail.getText().toString());
                     patient = existingPatient;
                 }
-
-                Utility.showProgress(mProgressView, mFormView, getBaseContext(), true);
+                pDialog = Utility.showTranslucentProgressDialog(AddPatientActivity.this);
 
 
                 String body = gson.toJson(patient);
@@ -100,18 +104,15 @@ public class AddPatientActivity extends ActionBarActivity {
                     @Override
                     protected void onPostExecute(String s) {
                         Toast.makeText(getApplicationContext(), "Saved Succesfuly", Toast.LENGTH_SHORT).show();
-                        Utility.showProgress(mProgressView, mFormView, getBaseContext(), false);
+                        pDialog.dismiss();
                         finish();
                     }
                 };
                 defaultRestClient.execute();
 
-                // TODO: Fix Move back to Main Activity
-                /*if (getActivity().findViewById(R.id.container) != null){
-                    FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.popBackStackImmediate();
-                }
-                else{getActivity().*///finish();
+                Intent returnIntent = new Intent();
+                setResult(Activity.RESULT_CANCELED, returnIntent);
+                finish();
             }
         });
     }
@@ -126,6 +127,16 @@ public class AddPatientActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    /*@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -137,6 +148,6 @@ public class AddPatientActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
 }

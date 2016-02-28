@@ -7,13 +7,13 @@
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_my_patients">My Patients</string>
     <string name="title_activity_videos">Videos</string>
-    <string name="title_activity_exercise">Exercise Schedule</string>
+    <string name="title_activity_exercise">Exercise Routine</string>
     <string name="title_activity_exercise_list">Available Exercises</string>
 
     <!--REST API Related-->
     <!--<string name="rest_client_uri">http://10.100.58.118:8080</string>-->
-    <!--<string name="rest_client_uri">http://192.168.250.15:8080</string>-->
-    <string name="rest_client_uri">http://myphysiodocapi-amaronline.rhcloud.com</string>
+    <string name="rest_client_uri">http://192.168.250.15:8080</string>
+    <!--<string name="rest_client_uri">http://myphysiodocapi-amaronline.rhcloud.com</string>-->
     <string name="rest_client_uri_exercise_videos">/videos</string>
     <string name="rest_client_uri_exercise">/webapi/exercise</string>
     <string name="rest_client_uri_patient">/webapi/patient</string>
@@ -21,5 +21,6 @@
     <string name="rest_client_uri_login">/webapi/authentication/login</string>
     <string name="rest_client_uri_logout">/webapi/authentication/logout</string>
     <string name="rest_api_key">3b91cab8-926f-49b6-ba00-920bcf934c2a</string>
+    <string name="ApplicationLogoText">Application Logo</string>
 
 </resources>

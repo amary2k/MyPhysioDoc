@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -63,11 +64,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
      */
     private UserLoginTask mAuthTask = null;
 
+    private ProgressDialog pDialog;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
+    //private View mProgressView;
+    //private View mLoginFormView;
     private Intent mainMenu;
     //private GoogleApiClient mGoogleApiClient;
     //private GoogleSignInOptions googleSignInOptionsObj = GoogleSignInOptions.DEFAULT_SIGN_IN;
@@ -113,8 +115,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        //mLoginFormView = findViewById(R.id.login_form);
+        //mProgressView = findViewById(R.id.login_progress);
     }
 
     private void populateAutoComplete() {
@@ -171,7 +173,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), true);
+            pDialog = Utility.showTranslucentProgressDialog(LoginActivity.this);
+            //Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute();
             //mAuthTask.onPostExecute();
@@ -348,7 +351,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), false);
+            pDialog.dismiss();
+            //Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), false);
 
             if (success) {
 
@@ -363,7 +367,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), false);
+            pDialog.dismiss();
+            //Utility.showProgress(mProgressView, mLoginFormView, getBaseContext(), false);
         }
     }
 }

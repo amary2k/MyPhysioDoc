@@ -3,89 +3,84 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.PhysiotherapistApp.ExersiceActivity"
     android:background="@android:color/holo_green_dark">
 
-    <TableLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TableRow
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_gravity="top"
+        android:layout_alignParentTop="true"
+        android:id="@+id/calViewContainer"
+        android:layout_alignParentBottom="false">
+
+        <CalendarView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:id="@+id/calendarView"
+            android:touchscreenBlocksFocus="false"
+            android:background="@android:color/darker_gray" />
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/exerciseButtonContainer"
+        android:layout_gravity="bottom"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentBottom="true">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
-
-                <CalendarView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/calendarView"
-                    android:layout_gravity="center|top"
-                    android:touchscreenBlocksFocus="false"
-                    android:background="@android:color/darker_gray" />
-            </FrameLayout>
-        </TableRow>
-
-        <TableRow
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ExpandableListView
-                    android:layout_width="match_parent"
-                    android:layout_height="227dp"
-                    android:id="@+id/exercise_expandableListView"
-                    android:layout_weight="1.48"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
-            </FrameLayout>
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/exerciseButtonContainer">
+                android:gravity="center">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <Button
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:gravity="center">
+                    android:text="Add"
+                    android:id="@+id/addExerciseButton"
+                    android:layout_gravity="left"
+                    android:drawableLeft="@android:drawable/ic_menu_add"
+                    android:layout_weight=".50" />
 
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Add"
-                        android:id="@+id/addExerciseButton"
-                        android:layout_gravity="left"
-                        android:drawableLeft="@android:drawable/ic_menu_add"
-                        android:layout_weight=".50" />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
+                    android:id="@+id/saveExerciseSchedule"
+                    android:drawableLeft="@android:drawable/ic_menu_save"
+                    android:layout_weight=".50"
+                    android:layout_gravity="right" />
+            </LinearLayout>
+        </FrameLayout>
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calViewContainer"
+        android:layout_above="@id/exerciseButtonContainer"
+        android:id="@+id/expandableListContainer">
 
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Save"
-                        android:id="@+id/saveExerciseSchedule"
-                        android:drawableLeft="@android:drawable/ic_menu_save"
-                        android:layout_weight=".50" />
-                </LinearLayout>
-            </FrameLayout>
-        </TableRow>
-    </TableLayout>
+        <ExpandableListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/exercise_expandableListView"
+            android:minWidth="100dp" />
+    </FrameLayout>
+
+
 
 </RelativeLayout>

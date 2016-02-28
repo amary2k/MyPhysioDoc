@@ -1,8 +1,10 @@
 package com.example.PhysiotherapistApp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -49,8 +51,9 @@ import java.util.Map;
  */
 public class ExerciseFragment extends Fragment {
 
-        private View mProgressView;
-        private View mButtonView;
+        private ProgressDialog pDialog;
+        //private View mProgressView;
+        //private View mButtonView;
         private Patient patient;
         //private Collection<Exercise> exerciseList = new ArrayList<>();
         private CalendarView calendarView;
@@ -76,8 +79,8 @@ public class ExerciseFragment extends Fragment {
             rootView = inflater.inflate(R.layout.fragment_exersice, container, false);
 
             finalInflater = inflater;
-            mButtonView = rootView.findViewById(R.id.addExerciseButton);
-            mProgressView = getActivity().findViewById(R.id.progressBar);
+            //mButtonView = rootView.findViewById(R.id.addExerciseButton);
+            //mProgressView = getActivity().findViewById(R.id.progressBar);
 
             expandbleLis = (ExpandableListView) rootView.findViewById(R.id.exercise_expandableListView);
 
@@ -87,6 +90,7 @@ public class ExerciseFragment extends Fragment {
                 String patientName = getArguments().getString("patientName");
 
 
+                getActivity().setTitle(patientName.substring(0, 1).toUpperCase() + patientName.substring(1));
 
                     /*physio = new JSONObject(response);
                     JSONArray jsonArray = (JSONArray) physio.get("patients");
@@ -143,13 +147,14 @@ public class ExerciseFragment extends Fragment {
                 public void onClick(View v) {
 
                     // Show Progress Bar
-                    Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
+                    //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
+                    pDialog = Utility.showTranslucentProgressDialog(getActivity());
                     DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_exercise), v, null, RestClient.APPLICATION_JSON, getContext()) {
                         @Override
                         protected void onPostExecute(String s) {
                             // Hide Progress Bar
-
-                            Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), false);
+                            pDialog.dismiss();
+                            //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), false);
                             Intent i = new Intent(getContext(), ExerciseListActivity.class);
                             Bundle b = new Bundle();
                             b.putString("response", s); //Passing response to new acitivity
@@ -166,12 +171,14 @@ public class ExerciseFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
+                    //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
+                    pDialog = Utility.showTranslucentProgressDialog(getActivity());
                     DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.PUT, getContext().getString(R.string.rest_client_uri_patient), v, patient.getJSON(), RestClient.APPLICATION_JSON, getContext()) {
                         @Override
                         protected void onPostExecute(String s) {
                             // Hide Progress Bar
-                            Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), false);
+                            pDialog.dismiss();
+                            //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), false);
                             if (s == null || s.length() < 1)
                                 Toast.makeText(getActivity().getApplicationContext(), "Failed to Save", Toast.LENGTH_SHORT).show();
                             else
@@ -186,7 +193,7 @@ public class ExerciseFragment extends Fragment {
             if(!UserState.isPhysio())
                 rootView.findViewById(R.id.exerciseButtonContainer).setVisibility(View.GONE);
 
-            expandbleLis.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            /*expandbleLis.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
@@ -224,7 +231,7 @@ public class ExerciseFragment extends Fragment {
 
                 }
 
-            });
+            });*/
 
         reloadExercises();
         return rootView;
@@ -266,13 +273,16 @@ public class ExerciseFragment extends Fragment {
                 ArrayList<ArrayList<HashMap<String, String>>> childData = new ArrayList<ArrayList<HashMap<String, String>>>();
 
                 for(Exercise exercise:exerciseList) {
+
                     // Add Group
                     final HashMap<String, Object> group = new HashMap<String, Object>();
                     // TODO: Change to name with backend changes
-                    group.put(NAME, exercise.getTitle());
+                    group.put(NAME, exercise.getExercisePK().getTitle());
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         group.put(IMAGE, getResources().getDrawable(getResources().getIdentifier(exercise.getImageName(), "drawable", getActivity().getPackageName()), null));
                     }
+                    group.put("isComplete", exercise.getExercisePK().isComplete());
+
                     groupData.add(group);
 
                     // Add Respective Child
@@ -301,7 +311,14 @@ public class ExerciseFragment extends Fragment {
 
                                                 // Populate your custom view here
                                                 ((TextView) v.findViewById(R.id.exerciseRowName)).setText((String) ((Map<String, Object>) getGroup(groupPosition)).get(NAME));
+                                                // need to overlay
                                                 ((ImageView) v.findViewById(R.id.exerciseIcon)).setImageDrawable((Drawable) ((Map<String, Object>) getGroup(groupPosition)).get(IMAGE));
+
+                                                // For CheckMark
+                                                if((boolean) ((Map<String, Object>) getGroup(groupPosition)).get("isComplete"))
+                                                     v.findViewById(R.id.exerciseCheckMark).setAlpha(0.60f);
+                                                else
+                                                    v.findViewById(R.id.exerciseCheckMark).setAlpha(0.00f);
 
 
                                                 ImageButton imageButton = (ImageButton) v.findViewById(R.id.exerciseDelButton);
@@ -340,6 +357,35 @@ public class ExerciseFragment extends Fragment {
                                                 else
                                                     imageButton.setVisibility(View.GONE);
 
+                                                v.findViewById(R.id.exerciseCheckMark).setOnClickListener(new ImageButton.OnClickListener() {
+
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        final Collection<Schedule> schedules = patient.getSchedule();
+                                                        //Toast.makeText(getApplicationContext(), "" + calDayOfMonth, 0).show();// TODO Auto-generated method stub
+                                                        Iterator<Schedule> i = schedules.iterator();
+                                                        while (i.hasNext()) {
+                                                            Calendar cal = Calendar.getInstance();
+                                                            Schedule schedule = i.next();
+                                                            cal.setTime(schedule.getExercise_date());
+                                                            int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
+                                                            int exerciseMonth = cal.get(Calendar.MONTH);
+                                                            int exerciseYear = cal.get(Calendar.YEAR);
+
+                                                            if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
+                                                                int count = 0;
+                                                                for (Exercise exercise : schedule.getExercises()) {
+                                                                    if (groupPosition == count) {
+                                                                            exercise.getExercisePK().setComplete(!exercise.getExercisePK().isComplete());
+                                                                        break;
+                                                                    } else
+                                                                        count++;
+                                                                }
+                                                                reloadExercises();
+                                                            }
+                                                        }
+                                                    }
+                                                });
                                                 return v;
                                             }
 
@@ -348,21 +394,56 @@ public class ExerciseFragment extends Fragment {
                                                 return layoutInflater.inflate(R.layout.imagetextimage_group_row, null, false);
                                             }
 
-                                        /*@Override
-                                        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+                                        @Override
+                                        public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                                             final View v = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
 
                                             // Populate your custom view here
-                                            ((TextView) v.findViewById(R.id.exerciseRowName)).setText((String) ((Map<String, Object>) getChild(groupPosition, childPosition)).get(NAME));
-                                            ((ImageView) v.findViewById(R.id.exerciseIcon)).setImageDrawable((Drawable) ((Map<String, Object>) getChild(groupPosition, childPosition)).get(IMAGE));
+                                            ((TextView) v.findViewById(R.id.exerciseDescription)).setText((String) ((Map<String, Object>) getChild(groupPosition, childPosition)).get(NAME));
+
+                                            v.findViewById(R.id.exercisePlayVideoBtn).setOnClickListener(new ImageButton.OnClickListener() {
+
+                                                @Override
+                                                public void onClick(View v) {
+                                                    final Collection<Schedule> schedules = patient.getSchedule();
+                                                    //Toast.makeText(getApplicationContext(), "" + calDayOfMonth, 0).show();// TODO Auto-generated method stub
+                                                    Iterator<Schedule> i = schedules.iterator();
+                                                    while (i.hasNext()) {
+                                                        Calendar cal = Calendar.getInstance();
+                                                        Schedule schedule = i.next();
+                                                        cal.setTime(schedule.getExercise_date());
+                                                        int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
+                                                        int exerciseMonth = cal.get(Calendar.MONTH);
+                                                        int exerciseYear = cal.get(Calendar.YEAR);
+
+                                                        if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
+                                                            int count = 0;
+                                                            for (Exercise exercise : schedule.getExercises()) {
+                                                                if (groupPosition == count) {
+                                                                    if (exercise.getVideoLink() == null || exercise.getVideoLink().length() == 0) {
+                                                                        Toast.makeText(getActivity().getApplicationContext(), "No Videos for this Exercise", Toast.LENGTH_LONG).show();
+                                                                    } else {
+                                                                        String uri = getContext().getString(R.string.rest_client_uri) + getContext().getString(R.string.rest_client_uri_exercise_videos) + "/" + exercise.getVideoLink();
+                                                                        Intent newIntent = new Intent(getContext(), VideosActivity.class);
+                                                                        newIntent.putExtra("videoURI", uri);
+                                                                        startActivity(newIntent);
+                                                                    }
+                                                                    break;
+                                                                } else
+                                                                    count++;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
 
                                             return v;
                                         }
 
                                         @Override
                                         public View newChildView(boolean isLastChild, ViewGroup parent) {
-                                            return layoutInflater.inflate(R.layout.imagetextimage_group_row, null, false);
-                                        }*/
+                                            return layoutInflater.inflate(R.layout.imagetextimage_child_row, null, false);
+                                        }
                                         }
                 );
                 break;
@@ -375,6 +456,7 @@ public class ExerciseFragment extends Fragment {
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 Exercise exercise = (Exercise) data.getSerializableExtra("result");
+
                 for(Schedule schedule :patient.getSchedule())
                 {
                     if(calDate.getTime().getTime() == schedule.getExercise_date().getTime())

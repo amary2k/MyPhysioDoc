@@ -1,6 +1,7 @@
 package com.example.PhysiotherapistApp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,7 +29,8 @@ import java.util.HashMap;
  */
 public class MainFragment extends Fragment {
 
-    private View mProgressView;
+    //private View mProgressView;
+    private ProgressDialog pDialog;
     public MainFragment() {
     }
 
@@ -70,7 +72,7 @@ public class MainFragment extends Fragment {
 
         final View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mProgressView = getActivity().findViewById(R.id.progressBar);
+        //mProgressView = getActivity().findViewById(R.id.progressBar);
 
         ListView myListView = (ListView) rootView.findViewById(R.id.listView_menu);
         myListView.setAdapter(myArrayAdapter);
@@ -82,14 +84,18 @@ public class MainFragment extends Fragment {
 
                 if(UserState.isPhysio()) {
                     if (mainMenuItems[0].equalsIgnoreCase(itemText)) {
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
                         DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), view, null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
+                                pDialog.dismiss();
                                 Intent i = new Intent(getContext(), PhysioPatientsActivity.class);
+
                                 /*Bundle b = new Bundle();
                                 b.putString("response", s); //Passing response to new acitivity
                                 i.putExtras(b);*/
                                 startActivity(i);
+                                //getActivity().overridePendingTransition(R.animator.left_to_right, R.animator.left_to_right);
                             }
                         };
                         defaultRestClient.execute();
@@ -111,10 +117,11 @@ public class MainFragment extends Fragment {
                         /*Intent i = new Intent(view.getContext(), ExersiceActivity.class);
                         startActivity(i);*/
                     } else if (mainMenuItems[4].equalsIgnoreCase(itemText)) {
-
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
                         DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), view, null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
+                                pDialog.dismiss();
                                 Intent i = new Intent(getContext().getApplicationContext(), LoginActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(i);
@@ -126,6 +133,7 @@ public class MainFragment extends Fragment {
                 else{ // Patient part starts here
                     // Redirect to Exercise Patients
                     if (mainMenuItems[0].equalsIgnoreCase(itemText)) {
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
                         DefaultRestClient defaultRestClient = new DefaultRestClient(
                                 RestClient.GET,
                                 getContext().getString(R.string.rest_client_uri_patient),
@@ -134,6 +142,7 @@ public class MainFragment extends Fragment {
                                 getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
+                                pDialog.dismiss();
                                 Intent i = new Intent(getContext(), ExersiceActivity.class);
                                 startActivity(i);
                             }
@@ -141,9 +150,11 @@ public class MainFragment extends Fragment {
                         defaultRestClient.execute();
                     }
                     else if (mainMenuItems[1].equalsIgnoreCase(itemText)) {
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
                         DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_patient), view, null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
+                                pDialog.dismiss();
                                 Intent i = new Intent(getContext(), AddPatientActivity.class);
                                 startActivity(i);
                             }
@@ -160,9 +171,11 @@ public class MainFragment extends Fragment {
                         Intent i = new Intent(view.getContext(), ExersiceActivity.class);
                         startActivity(i);
                     } else if (mainMenuItems[3].equalsIgnoreCase(itemText)) {
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
                         DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), view, null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
+                                pDialog.dismiss();
                                 Intent i = new Intent(getContext().getApplicationContext(), LoginActivity.class);
                                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(i);
