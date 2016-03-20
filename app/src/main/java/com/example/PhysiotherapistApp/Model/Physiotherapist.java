@@ -12,7 +12,12 @@ public class Physiotherapist {
 
 	private long id;
 
+
+	private String phoneRegisterationId;
+
 	private String name;
+
+	private String email;
 
 	private String branch;
 
@@ -21,6 +26,9 @@ public class Physiotherapist {
 	private Date joining_date;
 
 	private Address address;
+
+
+	private Set<Message> messages = new HashSet<Message>();
 
 	private Collection<Patient> patients = new ArrayList<Patient>();
 	
@@ -54,7 +62,23 @@ public class Physiotherapist {
 	public void setJoining_date(Date joining_date) {
 		this.joining_date = joining_date;
 	}
-	
+
+	public String getPhoneRegisterationId() {
+		return phoneRegisterationId;
+	}
+
+	public void setPhoneRegisterationId(String phoneRegisterationId) {
+		this.phoneRegisterationId = phoneRegisterationId;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public Address getAddress() {
 		return address;
 	}
@@ -73,6 +97,15 @@ public class Physiotherapist {
 	public void addPatients(Patient patient){
 		this.patients.add(patient);
 	}
+
+	public Set<Message> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(Set<Message> messages) {
+		this.messages = messages;
+	}
+
 	public String getJSON(){
 		Gson gson = new Gson();
 		return gson.toJson(this);

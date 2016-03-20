@@ -6,6 +6,8 @@ import java.io.Serializable;
 public class ExercisePK implements Serializable{
 	private String title;
 	private boolean isComplete;
+
+	private int painLevel;
 	
 	public ExercisePK() {}
 	
@@ -13,6 +15,12 @@ public class ExercisePK implements Serializable{
 		super();
 		this.title = title;
 		this.isComplete = isComplete;
+	}
+	public ExercisePK(String title, boolean isComplete, int painLevel) {
+		super();
+		this.title = title;
+		this.isComplete = isComplete;
+		this.painLevel = painLevel;
 	}
 	public String getTitle() {
 		return title;
@@ -26,6 +34,12 @@ public class ExercisePK implements Serializable{
 	public void setComplete(boolean isComplete) {
 		this.isComplete = isComplete;
 	}
-	
-	
+
+	public int getPainLevel() {
+		return painLevel;
+	}
+
+	public void setPainLevel(int painLevel) {
+		this.painLevel = painLevel;
+	}
 }

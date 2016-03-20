@@ -1,11 +1,10 @@
 package com.example.PhysiotherapistApp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,15 +12,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +31,8 @@ import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
 import com.google.gson.Gson;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -63,6 +60,7 @@ public class ExerciseFragment extends Fragment {
         int calMonth;
         int calYear;
         Calendar calDate;
+        Date selectedDate;
 
         String response;
         ExpandableListView expandbleLis;
@@ -77,6 +75,8 @@ public class ExerciseFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_exersice, container, false);
+            calendarView = (CalendarView) rootView.findViewById(R.id.calendarView);
+            selectedDate = new Date(calendarView.getDate());
 
             finalInflater = inflater;
             //mButtonView = rootView.findViewById(R.id.addExerciseButton);
@@ -84,10 +84,22 @@ public class ExerciseFragment extends Fragment {
 
             expandbleLis = (ExpandableListView) rootView.findViewById(R.id.exercise_expandableListView);
 
-            response = RestClient.response;
+            //response = RestClient.response;
+            response = RestClient.getResponse(this.getActivity());
+
             //response = getArguments().getString("response");
             if(UserState.isPhysio()) {
                 String patientName = getArguments().getString("patientName");
+                String strSelectedDate = getArguments().getString("date");
+                if(strSelectedDate != null && strSelectedDate.length() > 0) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
+                    try {
+                        selectedDate = formatter.parse(strSelectedDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
 
 
                 getActivity().setTitle(patientName.substring(0, 1).toUpperCase() + patientName.substring(1));
@@ -120,7 +132,7 @@ public class ExerciseFragment extends Fragment {
             }
 
 
-            calendarView = (CalendarView) rootView.findViewById(R.id.calendarView);
+
             calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
                 @Override
                 public void onSelectedDayChange(CalendarView view, int year, int month,
@@ -134,7 +146,8 @@ public class ExerciseFragment extends Fragment {
             });
 
             Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date(calendarView.getDate()));
+            cal.setTime(selectedDate);
+            calendarView.setDate(selectedDate.getTime());
             calDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
             calMonth = cal.get(Calendar.MONTH);
             calYear = cal.get(Calendar.YEAR);
@@ -149,7 +162,7 @@ public class ExerciseFragment extends Fragment {
                     // Show Progress Bar
                     //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
                     pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                    DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_exercise), v, null, RestClient.APPLICATION_JSON, getContext()) {
+                    DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_exercise), null, RestClient.APPLICATION_JSON, getContext()) {
                         @Override
                         protected void onPostExecute(String s) {
                             // Hide Progress Bar
@@ -173,7 +186,7 @@ public class ExerciseFragment extends Fragment {
 
                     //Utility.showProgress(mProgressView, mButtonView, getActivity().getBaseContext(), true);
                     pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                    DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.PUT, getContext().getString(R.string.rest_client_uri_patient), v, patient.getJSON(), RestClient.APPLICATION_JSON, getContext()) {
+                    DefaultRestClient profiletRestClient = new DefaultRestClient(RestClient.PUT, getContext().getString(R.string.rest_client_uri_patient), patient.getJSON(), RestClient.APPLICATION_JSON, getContext()) {
                         @Override
                         protected void onPostExecute(String s) {
                             // Hide Progress Bar
@@ -191,7 +204,7 @@ public class ExerciseFragment extends Fragment {
 
 
             if(!UserState.isPhysio())
-                rootView.findViewById(R.id.exerciseButtonContainer).setVisibility(View.GONE);
+                rootView.findViewById(R.id.addExerciseButton).setVisibility(View.GONE);
 
             /*expandbleLis.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                 @Override
@@ -289,6 +302,8 @@ public class ExerciseFragment extends Fragment {
                     final ArrayList<HashMap<String, String>> group1data = new ArrayList<HashMap<String, String>>();
                     final HashMap<String, String> child = new HashMap<String, String>();
                     child.put(NAME, exercise.getDescription());
+                    String strPainLvl = exercise.getExercisePK().getPainLevel()==0? "":String.valueOf(exercise.getExercisePK().getPainLevel());
+                    child.put("PainLvl", strPainLvl);
                     group1data.add(child);
                     childData.add(group1data);
                 }
@@ -316,7 +331,7 @@ public class ExerciseFragment extends Fragment {
 
                                                 // For CheckMark
                                                 if((boolean) ((Map<String, Object>) getGroup(groupPosition)).get("isComplete"))
-                                                     v.findViewById(R.id.exerciseCheckMark).setAlpha(0.60f);
+                                                     v.findViewById(R.id.exerciseCheckMark).setAlpha(1.00f);
                                                 else
                                                     v.findViewById(R.id.exerciseCheckMark).setAlpha(0.00f);
 
@@ -361,29 +376,30 @@ public class ExerciseFragment extends Fragment {
 
                                                     @Override
                                                     public void onClick(View v) {
-                                                        final Collection<Schedule> schedules = patient.getSchedule();
-                                                        //Toast.makeText(getApplicationContext(), "" + calDayOfMonth, 0).show();// TODO Auto-generated method stub
-                                                        Iterator<Schedule> i = schedules.iterator();
-                                                        while (i.hasNext()) {
-                                                            Calendar cal = Calendar.getInstance();
-                                                            Schedule schedule = i.next();
-                                                            cal.setTime(schedule.getExercise_date());
-                                                            int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
-                                                            int exerciseMonth = cal.get(Calendar.MONTH);
-                                                            int exerciseYear = cal.get(Calendar.YEAR);
+                                                        if(UserState.isPhysio())
+                                                        {
+                                                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(DialogInterface dialog, int which) {
+                                                                    checkExerciseAsCompleteHandler(groupPosition);
+                                                                    /*switch (which){
+                                                                        case DialogInterface.BUTTON_POSITIVE:
+                                                                            checkExerciseAsCompleteHandler(groupPosition);
+                                                                            break;
 
-                                                            if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
-                                                                int count = 0;
-                                                                for (Exercise exercise : schedule.getExercises()) {
-                                                                    if (groupPosition == count) {
-                                                                            exercise.getExercisePK().setComplete(!exercise.getExercisePK().isComplete());
-                                                                        break;
-                                                                    } else
-                                                                        count++;
+                                                                        case DialogInterface.BUTTON_NEGATIVE:
+                                                                            //No button clicked
+                                                                            return;
+                                                                    }*/
                                                                 }
-                                                                reloadExercises();
-                                                            }
+                                                            };
+
+                                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                                            builder.setMessage("Mark exercise as completed?").setPositiveButton("Yes", dialogClickListener)
+                                                                    .setNegativeButton("No", dialogClickListener).show();
                                                         }
+                                                        else
+                                                            checkExerciseAsCompleteHandler(groupPosition);
                                                     }
                                                 });
                                                 return v;
@@ -394,12 +410,64 @@ public class ExerciseFragment extends Fragment {
                                                 return layoutInflater.inflate(R.layout.imagetextimage_group_row, null, false);
                                             }
 
+                                           public void checkExerciseAsCompleteHandler(int groupPosition){
+                                               final Collection<Schedule> schedules = patient.getSchedule();
+                                               //Toast.makeText(getApplicationContext(), "" + calDayOfMonth, 0).show();// TODO Auto-generated method stub
+                                               final Iterator<Schedule> i = schedules.iterator();
+                                               while (i.hasNext()) {
+                                                   Calendar cal = Calendar.getInstance();
+                                                   Schedule schedule = i.next();
+                                                   cal.setTime(schedule.getExercise_date());
+                                                   int exerciseDay = cal.get(Calendar.DAY_OF_MONTH);
+                                                   int exerciseMonth = cal.get(Calendar.MONTH);
+                                                   int exerciseYear = cal.get(Calendar.YEAR);
+
+                                                   if (exerciseDay == calDayOfMonth && exerciseMonth == calMonth && exerciseYear == calYear) {
+                                                       int count = 0;
+                                                       for (final Exercise exercise : schedule.getExercises()) {
+                                                           if (groupPosition == count) {
+
+                                                               boolean isComplete = exercise.getExercisePK().isComplete();
+                                                               if(!isComplete) {
+                                                                   AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+                                                                   final CharSequence items[] = new CharSequence[]{"1", "2", "3", "4", "5"};
+                                                                   adb.setSingleChoiceItems(items, 0, new DialogInterface.OnClickListener() {
+
+                                                                       @Override
+                                                                       public void onClick(DialogInterface d, int n) {
+                                                                           exercise.getExercisePK().setPainLevel(Integer.parseInt(items[n].toString()));
+                                                                           reloadExercises();
+                                                                           d.dismiss();
+                                                                       }
+
+                                                                   });
+                                                                   adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                                       @Override
+                                                                       public void onClick(DialogInterface dialog, int which) {
+                                                                           dialog.cancel();
+                                                                       }
+                                                                   });
+                                                                   adb.setTitle("Rate the pain from 1 (low) - 5 (high)");
+                                                                   adb.show();
+                                                               }
+                                                               else
+                                                                   exercise.getExercisePK().setPainLevel(0);
+                                                               exercise.getExercisePK().setComplete(!isComplete);
+                                                               break;
+                                                           } else
+                                                               count++;
+                                                       }
+                                                       reloadExercises();
+                                                   }
+                                               }
+                                           }
                                         @Override
                                         public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                                             final View v = super.getChildView(groupPosition, childPosition, isLastChild, convertView, parent);
 
                                             // Populate your custom view here
                                             ((TextView) v.findViewById(R.id.exerciseDescription)).setText((String) ((Map<String, Object>) getChild(groupPosition, childPosition)).get(NAME));
+                                            ((TextView) v.findViewById(R.id.exercisePainLvl)).setText((String) ((Map<String, Object>) getChild(groupPosition, childPosition)).get("PainLvl"));
 
                                             v.findViewById(R.id.exercisePlayVideoBtn).setOnClickListener(new ImageButton.OnClickListener() {
 

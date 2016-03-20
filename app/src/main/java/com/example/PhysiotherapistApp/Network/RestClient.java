@@ -1,13 +1,18 @@
 package com.example.PhysiotherapistApp.Network;
 
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.PhysiotherapistApp.LoginActivity;
 import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.R;
+import com.example.PhysiotherapistApp.Utility.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,7 +88,7 @@ public class RestClient {
 
             if(params != null && params.size() > 0) {
                 int i = 0;
-                for(Map.Entry<String, String> entry : bodyParams.entrySet()) {
+                for(Map.Entry<String, String> entry : params.entrySet()) {
                     if(i==0)
                         strURL += "?" + entry.getKey() + "=" + entry.getValue();
                     else
@@ -170,6 +175,14 @@ public class RestClient {
                 Log.v("RestClient", "HTTP_UNAVAILABLE");
                // Toast.makeText(context, "Server or Internet is down", Toast.LENGTH_LONG).show();
             }
+            else if(intResponseCode == HttpURLConnection.HTTP_BAD_METHOD) {
+                Log.v("RestClient", "HTTP_BAD_METHOD");
+                // Toast.makeText(context, "Server or Internet is down", Toast.LENGTH_LONG).show();
+            }
+            else if(intResponseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                Log.v("RestClient", "HTTP_NOT_FOUND");
+                // Toast.makeText(context, "Server or Internet is down", Toast.LENGTH_LONG).show();
+            }
             Log.e("RestClient", "Error Response Code:" + intResponseCode , e);
             strResponse = null;
         } finally {
@@ -187,6 +200,16 @@ public class RestClient {
         response = strResponse;
         return strResponse;
         //return null;
+    }
+
+    public static String getResponse(final Activity activity){
+
+        if(response == null) {
+            Intent i = new Intent(activity.getBaseContext().getApplicationContext(), LoginActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            activity.startActivity(i);
+        }
+        return response;
     }
    /* private ArrayList <NameValuePair> params;
     private ArrayList <NameValuePair> headers;

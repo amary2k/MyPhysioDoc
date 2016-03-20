@@ -3,15 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.PhysiotherapistApp.ExersiceActivity"
-    android:background="@android:color/holo_green_dark">
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </LinearLayout>
+    tools:context="com.example.PhysiotherapistApp.ExersiceActivity">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -26,7 +18,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/calendarView"
             android:touchscreenBlocksFocus="false"
-            android:background="@android:color/darker_gray" />
+            android:background="@drawable/backrepeat" />
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
@@ -35,7 +27,8 @@
         android:layout_gravity="bottom"
         android:layout_alignParentEnd="false"
         android:layout_alignParentStart="false"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:background="@color/material_grey_850">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -78,7 +71,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/exercise_expandableListView"
-            android:minWidth="100dp" />
+            android:minWidth="100dp"
+            android:dividerHeight="2dp"
+            android:divider="#00ffffff"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false"
+            android:childDivider="#00000000" />
     </FrameLayout>
 
 

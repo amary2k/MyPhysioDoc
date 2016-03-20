@@ -10,6 +10,8 @@ public class UserState {
 
     private static String userName;
 
+    private static String phoneRegisterationId;
+
     public static String getUserName() {
         return userName;
     }
@@ -32,5 +34,13 @@ public class UserState {
 
     public static void setAuthToken(String authToken) {
         UserState.authToken = authToken;
+    }
+
+    public static String getPhoneRegisterationId() {
+        return phoneRegisterationId;
+    }
+
+    public static void setPhoneRegisterationId(String phoneRegisterationId) {
+        UserState.phoneRegisterationId = phoneRegisterationId;
     }
 }

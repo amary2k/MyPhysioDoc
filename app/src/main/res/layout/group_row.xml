@@ -3,10 +3,10 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView android:id="@+id/row_name"
-        android:paddingLeft="50px"
-        android:textSize="24dp"
+        android:paddingLeft="40dp"
+        android:textSize="20dp"
         android:textStyle="bold|normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/background_light" />
+        android:textColor="@color/material_grey_850" />
 </LinearLayout>

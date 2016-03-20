@@ -6,16 +6,22 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -26,7 +32,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /*
 import com.google.android.gms.auth.api.Auth;
@@ -35,9 +43,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 */
 
+import com.example.PhysiotherapistApp.GCM.QuickstartPreferences;
+import com.example.PhysiotherapistApp.GCM.RegistrationIntentService;
+import com.example.PhysiotherapistApp.Model.Profile;
 import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import org.json.JSONObject;
@@ -53,15 +66,17 @@ import java.util.List;
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bhavana@singh:bhavana"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
+
+    // GCM Related
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private boolean isReceiverRegistered;
+    //private ProgressBar mRegistrationProgressBar;
+
+
+
     private UserLoginTask mAuthTask = null;
 
     private ProgressDialog pDialog;
@@ -71,8 +86,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     //private View mProgressView;
     //private View mLoginFormView;
     private Intent mainMenu;
-    //private GoogleApiClient mGoogleApiClient;
-    //private GoogleSignInOptions googleSignInOptionsObj = GoogleSignInOptions.DEFAULT_SIGN_IN;
+
+    public static Profile profile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,43 +95,64 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-       /* GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this *//* FragmentActivity *//*, this *//* OnConnectionFailedListener *//*)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();*/
-
         mainMenu = new Intent(this,MainActivity.class);
+        UserState.setPhoneRegisterationId("");
 
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+        pDialog = Utility.showTranslucentProgressDialog(LoginActivity.this);
+        //mRegistrationProgressBar = (ProgressBar) findViewById(R.id.registrationProgressBar);
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+            public void onReceive(Context context, Intent intent) {
+                //mRegistrationProgressBar.setVisibility(ProgressBar.GONE);
+
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    //Toast.makeText(getApplicationContext(), R.string.gcm_send_message, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.token_error_message, Toast.LENGTH_SHORT).show();
                 }
-                return false;
-            }
-        });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+                // Set up the login form.
+                mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+                populateAutoComplete();
 
-        //mLoginFormView = findViewById(R.id.login_form);
-        //mProgressView = findViewById(R.id.login_progress);
+                mPasswordView = (EditText) findViewById(R.id.password);
+                mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                        if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                            attemptLogin();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+                mEmailSignInButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        attemptLogin();
+                    }
+                });
+                pDialog.dismiss();
+            }
+        };
+
+        // Registering BroadcastReceiver
+        registerReceiver();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+
     }
 
     private void populateAutoComplete() {
@@ -130,6 +166,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
+
+        if(UserState.getPhoneRegisterationId().length() == 0) {
+            Log.v(LoginActivity.class.getName(),"Waiting for token to be received from GCM");
+            return;
+        }
         if (mAuthTask != null) {
             return;
         }
@@ -191,42 +232,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         return password.length() > 3;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     *//*
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }*/
-
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
@@ -281,6 +286,47 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailView.setAdapter(adapter);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        isReceiverRegistered = false;
+        super.onPause();
+    }
+
+    private void registerReceiver(){
+        if(!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+            isReceiverRegistered = true;
+        }
+    }
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(this.getClass().getName(), "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -302,6 +348,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             HashMap<String,String> userNamePass = new HashMap<String,String>();
             userNamePass.put("username",mEmail);
             userNamePass.put("password",mPassword);
+            userNamePass.put("phoneRegId",UserState.getPhoneRegisterationId());
             RestClient restClient = new RestClient(RestClient.POST,getString(R.string.rest_client_uri_login),new HashMap<String,String>(),new HashMap<String,String>(), userNamePass, getBaseContext());
 
             try {
@@ -335,14 +382,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             UserState.setAuthToken(strAuthToken);
             UserState.setIsPhysio(isPhysio);
             UserState.setUserName(mEmail);
-
-           /* for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }*/
 
             // TODO: register the new account here.
             return true;

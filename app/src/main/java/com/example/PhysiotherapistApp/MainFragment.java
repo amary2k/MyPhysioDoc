@@ -3,7 +3,6 @@ package com.example.PhysiotherapistApp;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,10 +18,6 @@ import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
-
-import java.io.BufferedReader;
-import java.net.HttpURLConnection;
-import java.util.HashMap;
 
 /**
  * Created by Amar on 2016-02-06.
@@ -45,8 +40,7 @@ public class MainFragment extends Fragment {
             mainMenuItems = new String[]{
                 "My Patients",      //Done
                 "Add Patient",      //Done
-                "Manage Videos",    //Done
-                "Messenger",
+                //"Manage Videos",
                 "Logout"            //Done
 
             };
@@ -56,7 +50,7 @@ public class MainFragment extends Fragment {
             mainMenuItems = new String[]{
                 "Exercise Routine", //Done
                     "My Profile",   //Done
-                "Messenger",
+                "Messenger",        // Done
                 "Logout"            //Done
 
             };
@@ -85,7 +79,7 @@ public class MainFragment extends Fragment {
                 if(UserState.isPhysio()) {
                     if (mainMenuItems[0].equalsIgnoreCase(itemText)) {
                         pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), view, null, RestClient.APPLICATION_JSON, getContext()) {
+                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
                                 pDialog.dismiss();
@@ -107,18 +101,13 @@ public class MainFragment extends Fragment {
                         startActivity(i);
                         /*IntentIntegrator scanIntegrator = new IntentIntegrator(getActivity());
                         scanIntegrator.initiateScan();*/
-                    } else if (mainMenuItems[2].equalsIgnoreCase(itemText)) {
+                    } /*else if (mainMenuItems[2].equalsIgnoreCase(itemText)) {
                         Intent i = new Intent(view.getContext(), VideosActivity.class);
                         startActivity(i);
-                    }
-                    // Redirect to a website
-                    else if (mainMenuItems[3].equalsIgnoreCase(itemText)) {
-                       // TODO: Under Construction
-                        /*Intent i = new Intent(view.getContext(), ExersiceActivity.class);
-                        startActivity(i);*/
-                    } else if (mainMenuItems[4].equalsIgnoreCase(itemText)) {
+                    }*/
+                    else if (mainMenuItems[2].equalsIgnoreCase(itemText)) {
                         pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), view, null, RestClient.APPLICATION_JSON, getContext()) {
+                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
                                 pDialog.dismiss();
@@ -137,7 +126,7 @@ public class MainFragment extends Fragment {
                         DefaultRestClient defaultRestClient = new DefaultRestClient(
                                 RestClient.GET,
                                 getContext().getString(R.string.rest_client_uri_patient),
-                                view, null,
+                                null,
                                 RestClient.APPLICATION_JSON,
                                 getContext()) {
                             @Override
@@ -151,7 +140,7 @@ public class MainFragment extends Fragment {
                     }
                     else if (mainMenuItems[1].equalsIgnoreCase(itemText)) {
                         pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_patient), view, null, RestClient.APPLICATION_JSON, getContext()) {
+                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_patient), null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
                                 pDialog.dismiss();
@@ -166,13 +155,19 @@ public class MainFragment extends Fragment {
                     }*/
                     // Redirect to a website
                     else if (mainMenuItems[2].equalsIgnoreCase(itemText)) {
-                       /* Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
-                        startActivity(i);*/
-                        Intent i = new Intent(view.getContext(), ExersiceActivity.class);
-                        startActivity(i);
+                        pDialog = Utility.showTranslucentProgressDialog(getActivity());
+                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_patient), null, RestClient.APPLICATION_JSON, getContext()) {
+                            @Override
+                            protected void onPostExecute(String s) {
+                                pDialog.dismiss();
+                                Intent i = new Intent(getContext(), MessagingActivity.class);
+                                startActivity(i);
+                            }
+                        };
+                        defaultRestClient.execute();
                     } else if (mainMenuItems[3].equalsIgnoreCase(itemText)) {
                         pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), view, null, RestClient.APPLICATION_JSON, getContext()) {
+                        DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.POST, getContext().getString(R.string.rest_client_uri_logout), null, RestClient.APPLICATION_JSON, getContext()) {
                             @Override
                             protected void onPostExecute(String s) {
                                 pDialog.dismiss();

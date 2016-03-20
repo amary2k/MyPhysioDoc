@@ -3,9 +3,7 @@ package com.example.PhysiotherapistApp;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -15,19 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.PhysiotherapistApp.Model.Address;
 import com.example.PhysiotherapistApp.Model.Patient;
-import com.example.PhysiotherapistApp.Model.Physiotherapist;
 import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
 import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.net.HttpURLConnection;
 import java.util.Date;
-import java.util.HashMap;
 
 
 public class AddPatientActivity extends AppCompatActivity {
@@ -80,10 +73,12 @@ public class AddPatientActivity extends AppCompatActivity {
                 String methdoCall;
                 if(UserState.isPhysio()) {
                     methdoCall = RestClient.POST;
-                    patient = new Patient(editTextName.getText().toString(),
+                    patient = new Patient(editTextEmail.getText().toString(),
+                            editTextName.getText().toString(),
                             editTextBranch.getText().toString(),
                             editTextHospitalName.getText().toString(),
-                            editTextEmail.getText().toString());
+                            new Date(),
+                            UserState.getUserName());
                 }
                 else
                 {
@@ -100,7 +95,7 @@ public class AddPatientActivity extends AppCompatActivity {
                 String body = gson.toJson(patient);
 
 
-                DefaultRestClient defaultRestClient = new DefaultRestClient(methdoCall, getBaseContext().getString(R.string.rest_client_uri_patient), v, body, RestClient.APPLICATION_JSON, getBaseContext()) {
+                DefaultRestClient defaultRestClient = new DefaultRestClient(methdoCall, getBaseContext().getString(R.string.rest_client_uri_patient), body, RestClient.APPLICATION_JSON, getBaseContext()) {
                     @Override
                     protected void onPostExecute(String s) {
                         Toast.makeText(getApplicationContext(), "Saved Succesfuly", Toast.LENGTH_SHORT).show();

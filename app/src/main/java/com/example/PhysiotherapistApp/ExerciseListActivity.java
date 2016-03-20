@@ -2,7 +2,11 @@ package com.example.PhysiotherapistApp;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.app.NavUtils;
@@ -23,7 +27,11 @@ import com.example.PhysiotherapistApp.Utility.Utility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +39,7 @@ import java.util.List;
 public class ExerciseListActivity extends AppCompatActivity {
 
     List<Exercise> exerciseList;
+    private ProgressDialog pDialog;
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +62,22 @@ public class ExerciseListActivity extends AppCompatActivity {
         List<String> textItems = new ArrayList<>();
 
         Iterator<Exercise> listIterator = exerciseList.iterator();
+        pDialog = Utility.showTranslucentProgressDialog(this);
         while(listIterator.hasNext()){
             Exercise exercise = listIterator.next();
 
+           /* try {
+                imageList.add(new BitmapDrawable(getResources(),
+                        drawable_from_url(this.getBaseContext().getString(R.string.rest_client_uri) + this.getBaseContext().getString(R.string.rest_client_uri_images) + "/" + exercise.getImageName())));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+
             int resourceId = getResources().getIdentifier(exercise.getImageName(), "drawable", getPackageName());
             imageList.add(getResources().getDrawable(resourceId, null ));
-            textItems.add(exercise.getDescription());
+            textItems.add(exercise.getExercisePK().getTitle());
         }
+        pDialog.dismiss();
 
 
         ImageTextAdapter imageTextAdapter = new ImageTextAdapter(this,textItems,imageList);
@@ -88,6 +106,18 @@ public class ExerciseListActivity extends AppCompatActivity {
         });
     }
 
+    /*Bitmap drawable_from_url(String url) throws java.net.MalformedURLException, java.io.IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection)new URL(url) .openConnection();
+        connection.setRequestProperty("User-agent", "Mozilla/4.0");
+
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return x;
+    }*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

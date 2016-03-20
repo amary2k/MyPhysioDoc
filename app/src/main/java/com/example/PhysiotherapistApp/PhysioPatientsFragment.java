@@ -2,19 +2,15 @@ package com.example.PhysiotherapistApp;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
-import android.widget.TextView;
 
-import com.example.PhysiotherapistApp.Model.UserState;
 import com.example.PhysiotherapistApp.Network.DefaultRestClient;
 import com.example.PhysiotherapistApp.Network.RestClient;
 import com.example.PhysiotherapistApp.Utility.Utility;
@@ -23,8 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -76,22 +70,24 @@ public class PhysioPatientsFragment extends Fragment {
                 for (int i=0; i<jsonArray.length(); i++) {
                     // Hierarchy for name
                     String name = ((JSONObject) jsonArray.get(i)).getString("name");
+                    String email = ((JSONObject) jsonArray.get(i)).getString("email");
                     // Group Data
                     HashMap m = new HashMap();
                     m.put("Group Item", name );
+                    m.put("Group Item Email",email);
                     listGroupData.add(m);
 
                     // Child Group Data
                     ArrayList secList = new ArrayList();
                     HashMap cm  = new HashMap();
                     cm.put("Child Item", "Exercise Routine");
-                    secList.add( cm );/*
+                    secList.add( cm );
                     cm = new HashMap();
-                    cm.put("Child Item", "Rcommended Video");
+                    cm.put("Child Item", "Message");
                     secList.add( cm );
                     cm = new HashMap();
                     cm.put("Child Item", "Progress Summary");
-                    secList.add( cm );*/
+                    secList.add( cm );
                     listChildGroupData.add(secList);
                 }
                 if(jsonArray.length() > 0)
@@ -115,10 +111,11 @@ public class PhysioPatientsFragment extends Fragment {
       /* You must make use of the View v, find the view by id and extract the text as below*/
 
                             ExpandableListAdapter mAdapter = parent.getExpandableListAdapter();
-                            final String groupName = (String) ((HashMap)mAdapter.getGroup(groupPosition)).get("Group Item");
+                            final String groupName = (String) ((HashMap) mAdapter.getGroup(groupPosition)).get("Group Item");
+                            final String groupEmail = (String) ((HashMap) mAdapter.getGroup(groupPosition)).get("Group Item Email");
                             if (childPosition == 0) {
                                 pDialog = Utility.showTranslucentProgressDialog(getActivity());
-                                DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), v, null, RestClient.APPLICATION_JSON, getContext()) {
+                                DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), null, RestClient.APPLICATION_JSON, getContext()) {
                                     @Override
                                     protected void onPostExecute(String s) {
                                         pDialog.dismiss();
@@ -127,6 +124,36 @@ public class PhysioPatientsFragment extends Fragment {
                                         b.putString("patientName", groupName);
                                         i.putExtras(b);
                                         startActivity(i);
+                                    }
+                                };
+                                defaultRestClient.execute();
+                            } else if (childPosition == 1) {
+                                pDialog = Utility.showTranslucentProgressDialog(getActivity());
+                                DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_physiotherapist), null, RestClient.APPLICATION_JSON, getContext()) {
+                                    @Override
+                                    protected void onPostExecute(String s) {
+                                        pDialog.dismiss();
+                                        Intent i = new Intent(getContext(), MessagingActivity.class);
+                                        Bundle b = new Bundle();
+                                        b.putString("groupEmail", groupEmail);
+                                        i.putExtras(b);
+                                        startActivity(i);
+                                    }
+                                };
+                                defaultRestClient.execute();
+                            } else if (childPosition == 2) {
+                                pDialog = Utility.showTranslucentProgressDialog(getActivity());
+                                HashMap<String,String> params = new HashMap<String, String>();
+                                params.put("patientEmail",groupEmail);
+                                DefaultRestClient defaultRestClient = new DefaultRestClient(RestClient.GET, getContext().getString(R.string.rest_client_uri_summary), params, null, RestClient.APPLICATION_JSON, getContext()) {
+                                    @Override
+                                    protected void onPostExecute(String s) {
+                                        pDialog.dismiss();
+                                Intent i = new Intent(getContext(), SummaryActivity.class);
+                                Bundle b = new Bundle();
+                                b.putString("patientName", groupName);
+                                i.putExtras(b);
+                                startActivity(i);
                                     }
                                 };
                                 defaultRestClient.execute();

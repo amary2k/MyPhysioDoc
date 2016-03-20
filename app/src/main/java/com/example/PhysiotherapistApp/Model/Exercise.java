@@ -19,6 +19,7 @@ public class Exercise implements Serializable{
 
 	private String videoLink;
 
+
 	//private boolean isComplete;
 
 	private transient Collection<Schedule> schedule = new ArrayList<Schedule>();
