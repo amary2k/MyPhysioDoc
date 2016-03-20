@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/list_item_menu_item"
+    android:padding="@dimen/list_item_padding">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chatBox"
+        android:layout_alignParentEnd="false"
+        android:background="#88e0e0e0">
+
+        <TextView
+            android:id="@+id/chatMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="@color/common_plus_signin_btn_text_light_pressed"
+            android:layout_weight="0.90"
+            android:layout_gravity="center|left|top"
+            android:textAlignment="center"
+            android:layout_margin="4dp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/chatTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            android:textColor="@color/wallet_holo_blue_light"
+            android:layout_weight="0.10"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="2dp">
+        </TextView>
+    </LinearLayout>
+
+</RelativeLayout>
